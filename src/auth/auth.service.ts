@@ -16,6 +16,7 @@ import { Model } from 'mongoose';
 import { RegisterAgentDto, RegisterStoreDto } from './dto/register.dto';
 import { StoreService } from 'src/store/store.service';
 import { TokenStatusEnum, UserRolesEnum } from 'src/utils/constants';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,15 @@ export class AuthService {
     @InjectModel(RegistrationToken.name)
     private registrationTokenModel: Model<RegistrationToken>,
   ) {}
+
+  loginUser(user: UserDocument) {
+    const payload = { username: user.email, sub: user._id };
+    const accessToken = this.jwtService.sign(payload);
+    return {
+      accessToken: accessToken,
+      user: user,
+    };
+  }
 
   async registerAgent(registerAgentDto: RegisterAgentDto) {
     const registrationToken = await this.validateRegistrationToken(
@@ -53,36 +63,6 @@ export class AuthService {
     return store;
   }
 
-  async validateRegistrationToken(token: string, use: UserRolesEnum) {
-    const registrationToken = await this.registrationTokenModel.findOne({
-      token: token,
-    });
-
-    if (!registrationToken) {
-      throw new UnauthorizedException('Invalid Token');
-    }
-    if (registrationToken.use !== use) {
-      throw new UnauthorizedException('Invalid Token');
-    }
-    const currentDate = moment(moment.now()).toDate().valueOf();
-
-    if (currentDate > moment(registrationToken.tokenTTl).toDate().valueOf()) {
-      registrationToken.status = TokenStatusEnum.CLOSED;
-      await registrationToken.save();
-      throw new UnauthorizedException('Token Expired');
-    }
-    return registrationToken;
-  }
-
-  loginUser(user: UserDocument) {
-    const payload = { username: user.email, sub: user._id };
-    const accessToken = this.jwtService.sign(payload);
-    return {
-      accessToken: accessToken,
-      user: user,
-    };
-  }
-
   async generateRegistrationToken(
     generateRegistrationTokenDto: GenerateRegistrationTokenDto,
   ) {
@@ -105,6 +85,27 @@ export class AuthService {
     return newRegistrationToken;
   }
 
+  async validateRegistrationToken(token: string, use: UserRolesEnum) {
+    const registrationToken = await this.registrationTokenModel.findOne({
+      token: token,
+    });
+
+    if (!registrationToken) {
+      throw new UnauthorizedException('Invalid Token');
+    }
+    if (registrationToken.use !== use) {
+      throw new UnauthorizedException('Invalid Token');
+    }
+    const currentDate = moment(moment.now()).toDate().valueOf();
+
+    if (currentDate > moment(registrationToken.tokenTTl).toDate().valueOf()) {
+      registrationToken.status = TokenStatusEnum.CLOSED;
+      await registrationToken.save();
+      throw new UnauthorizedException('Token Expired');
+    }
+    return registrationToken;
+  }
+
   async getAuthenticatedUser(usernameOrEmail: string, password: string) {
     const user =
       await this.userService.findOneByEmailOrUserName(usernameOrEmail);
@@ -119,5 +120,28 @@ export class AuthService {
     const user =
       await this.userService.findOneByEmailOrUserName(emailOrUserName);
     return user;
+  }
+
+  //Confirm User Email
+  async confirmUserEmail(email: string, token: string) {
+    const res = await this.userService.confirmUserEmail(email, token);
+    return res;
+  }
+
+  async sendConfirmEmail(email: string) {
+    const user = await this.userService.findOneByEmailOrUserName(email);
+    const res = await this.userService.generateConfirmEmailToken(user);
+    return res;
+  }
+
+  //Change Password
+  async getChangePasswordUrl(email: string) {
+    const res = await this.userService.generatePasswordResetLink(email);
+    return res;
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    const res = await this.userService.changePassword(changePasswordDto);
+    return res;
   }
 }

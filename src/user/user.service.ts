@@ -20,7 +20,7 @@ import * as otpGenerator from 'otp-generator';
 import * as moment from 'moment-timezone';
 import bcrypt from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
-import { encrypt } from '../utils/encryption';
+import { encryptData } from '../utils/encryption';
 import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
 
 @Injectable()
@@ -38,7 +38,6 @@ export class UserService {
       role: UserRolesEnum.AGENT,
     });
     const emailSentUser = await this.generateConfirmEmailToken(newUser);
-    await emailSentUser.save();
     return emailSentUser;
   }
 
@@ -129,24 +128,22 @@ export class UserService {
     const expire = moment().add(15, 'minutes');
     user.emailConfirmationToken = verificationToken;
     user.emailConfirmationTTL = expire.toDate();
-    this.notificationService
-      .sendNotification('EmailConfirmationRequest')
-      .medium(['email'])
-      .send({
-        title: 'Email Confirmed',
-        extraInfo: '',
-        name: `${user.firstName} ${user.lastName} `,
-        recipientMail: user.email,
-        subject: 'Confirm Email',
-        data: {
-          token: verificationToken,
-        },
-      });
+    this.notificationService.sendEmailConfirmationRequestNotification({
+      title: 'Email Confirmed',
+      extraInfo: '',
+      name: `${user.firstName} ${user.lastName} `,
+      user: user,
+      subject: 'Confirm Email',
+      data: {
+        token: verificationToken,
+      },
+    });
+    await user.save();
     return user;
   }
 
-  async confirmUserEmail(userId: string, token: string) {
-    const user = await this.findOne(userId);
+  async confirmUserEmail(email: string, token: string) {
+    const user = await this.findOneByEmailOrUserName(email);
     const currentDate = moment(moment.now()).toDate().valueOf();
 
     if (currentDate > moment(user.emailConfirmationTTL).toDate().valueOf()) {
@@ -158,18 +155,13 @@ export class UserService {
     user.emailConfirmed = true;
     user.emailConfirmationTTL = null;
     user.emailConfirmationToken = null;
-    // await this.notificationService.sendNotification({
-    //   type: 'EmailConfirmed',
-    //   medium: ['email'],
-    //   data: {
-    //     data: '',
-    //     title: 'Email Confirmed',
-    //     extraInfo: '',
-    //     name: `${user.firstName} ${user.lastName} `,
-    //     recipientMail: user.email,
-    //     subject: 'Confirm Email',
-    //   },
-    // });
+    await this.notificationService.sendEmailConfirmationSuccessNotification({
+      title: 'Email Confirmed',
+      extraInfo: '',
+      name: `${user.firstName} ${user.lastName} `,
+      user: user,
+      subject: 'Confirm Email',
+    });
 
     await user.save();
     return user;
@@ -198,12 +190,20 @@ export class UserService {
       email: user.email,
       token: user.passwordResetToken,
     };
-    const token = encrypt(JSON.stringify(details));
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const token = encryptData(JSON.stringify(details));
     const passwordResetUrl = `${this.configService.get(
       'CLIENT_URL',
     )}/auth/reset-password?details=${token}`;
-    // this.notificationService.sendPasswordChangeRequestNotification();
+    this.notificationService.sendChangePasswordRequestNotification({
+      title: 'Password Change Request',
+      extraInfo: '',
+      name: `${user.firstName} ${user.lastName} `,
+      user: user,
+      subject: 'Change Passsword',
+      data: {
+        url: passwordResetUrl,
+      },
+    });
     await user.save();
   }
 

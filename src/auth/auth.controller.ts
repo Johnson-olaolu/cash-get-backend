@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +16,8 @@ import { AuthGuard } from '@nestjs/passport';
 import RoleGuard from './guards/roleGuards.guard';
 import { UserRolesEnum } from 'src/utils/constants';
 import { RegisterAgentDto } from './dto/register.dto';
+import { ConfirmEmailDto } from './dto/confirm-email.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -60,6 +64,49 @@ export class AuthController {
     return {
       success: true,
       message: 'Agent registered please confirm your email',
+      data: data,
+    };
+  }
+
+  @Post('confirm-email')
+  async confirmEmail(@Body() confirmEmailDto: ConfirmEmailDto) {
+    const data = await this.authService.confirmUserEmail(
+      confirmEmailDto.email,
+      confirmEmailDto.token,
+    );
+    return {
+      success: true,
+      message: 'Email confirmed successfully',
+      data: data,
+    };
+  }
+
+  @Get('confirm-email')
+  async sendConfirmEmail(@Query('email') email: string) {
+    const data = await this.authService.sendConfirmEmail(email);
+    return {
+      success: true,
+      message: 'Email confirmed request sent successfully',
+      data: data,
+    };
+  }
+
+  @Get('change-password')
+  async sendChangePasswordLink(@Query('email') email: string) {
+    const data = await this.authService.getChangePasswordUrl(email);
+    return {
+      success: true,
+      message: 'Password reset link sent successfully',
+      data: data,
+    };
+  }
+
+  @Post('change-password')
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    const data = await this.authService.changePassword(changePasswordDto);
+    return {
+      success: true,
+      message: 'Password changed successfully',
       data: data,
     };
   }

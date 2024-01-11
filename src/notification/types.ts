@@ -1,14 +1,16 @@
+import { UserDocument } from 'src/user/schemas/user.schema';
+
 export interface INotification<T> {
   medium: notificationMedium[];
   data: INotificationData<T>;
 }
 
 export interface INotificationData<T> {
-  recipientMail?: string;
+  user?: UserDocument;
   subject?: string;
   name?: string;
   title: string;
-  data: T;
+  data?: T;
   extraInfo?: string;
 }
 
@@ -20,4 +22,7 @@ export type notificationType =
 
 export interface IEmailConfirmationRequest {
   token: string;
+}
+export interface IPasswordChangeRequest {
+  url: string;
 }

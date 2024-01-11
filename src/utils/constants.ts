@@ -28,3 +28,8 @@ export const superAdminDetails: CreateUserDto = {
   //   role: UserRolesEnum.SUPER_ADMIN,
   userName: 'superAdmin',
 };
+
+export enum AppNotificationEnum {
+  CREATED = 'CREATED',
+  SEEN = 'SEEN',
+}
