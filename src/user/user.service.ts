@@ -10,15 +10,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  BCRYPT_HASH_ROUND,
-  UserRolesEnum,
-  superAdminDetails,
-} from 'src/utils/constants';
+import { UserRolesEnum, superAdminDetails } from 'src/utils/constants';
 import { NotificationService } from 'src/notification/notification.service';
 import * as otpGenerator from 'otp-generator';
 import * as moment from 'moment-timezone';
-import bcrypt from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { encryptData } from '../utils/encryption';
 import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
@@ -218,11 +213,11 @@ export class UserService {
       throw new UnauthorizedException('Invalid Token');
     }
 
-    const hashedPass = await bcrypt.hash(
-      changePasswordDto.password,
-      BCRYPT_HASH_ROUND,
-    );
-    user.password = hashedPass;
+    // const hashedPass = await bcrypt.hash(
+    //   changePasswordDto.password,
+    //   BCRYPT_HASH_ROUND,
+    // );
+    user.password = changePasswordDto.password;
     user.passwordResetToken = null;
     user.passwordResetTTL = null;
     await user.save();
