@@ -1,27 +1,32 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
+import { UserDocument } from 'src/user/schemas/user.schema';
 import { AppNotificationEnum } from 'src/utils/constants';
-export type UserDocument = HydratedDocument<AppNotification>;
+export type AppNotificationDocument = HydratedDocument<AppNotification>;
 
 @Schema({
   timestamps: true,
 })
 export class AppNotification {
   @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
-  user: User;
+  user: UserDocument;
+
+  // @Prop({
+  //   unique: true,
+  // })
+  // token: string;
 
   @Prop({
-    unique: true,
+    required: true,
   })
-  token: string;
+  summary: string;
 
   @Prop()
   notificationType: string;
 
   @Prop()
-  notificationId: string;
+  notificationRef: string;
 
   @Prop({
     enum: AppNotificationEnum,

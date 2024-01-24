@@ -33,3 +33,45 @@ export enum AppNotificationEnum {
   CREATED = 'CREATED',
   SEEN = 'SEEN',
 }
+
+export enum TransactionTypeEnum {
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT',
+}
+
+export enum TransactionStatusEnum {
+  INITIATED = 'INITIATED',
+  CONFIRMED = 'CONFIRMED',
+}
+
+export enum WalletTransactionActionEnum {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAWAL = 'WITHDRAWAL',
+  TRANSFER = 'TRANSFER',
+  RECIEVE = 'RECIEVE',
+  PAYMENT = 'PAYMENT',
+}
+
+export enum CloudinaryFoldersEnum {
+  STORE_PROFILE = 'store-profile',
+  AGENT_PROFILE = 'agent-profile',
+}
+
+export enum TransactionActionEnum {
+  MONNIFY_DEBIT = ' MONNIFY_DEBIT',
+  MONNIFY_CREDIT = 'MONNIFY_CREDIT',
+  ESCROW_CREDIT = 'ESCROW_CREDIT',
+  CREDIT = 'CREDIT',
+  DEBIT = 'DEBIT',
+}
+
+export enum OrderStatusesEnum {
+  INITIATED = 'INITIATED',
+  PAID = 'PAID',
+  ACCEPTED = 'ACCEPTED',
+  PROCESSING = 'PROCESSING',
+  DELIVERED = 'DELIVERED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELED',
+  FAILED = 'FAILED',
+}

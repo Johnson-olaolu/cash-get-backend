@@ -8,10 +8,14 @@ import {
 import { UserDocument } from 'src/user/schemas/user.schema';
 import * as moment from 'moment';
 import * as uniqid from 'uniqid';
+import { AppService } from './app/app.service';
 
 @Injectable()
 export class NotificationService {
-  constructor(private emailService: EmailService) {}
+  constructor(
+    private emailService: EmailService,
+    private appService: AppService,
+  ) {}
 
   private generateNotificationReference(user: UserDocument) {
     const presentDate = moment().format('YYYYMMDD');
@@ -41,7 +45,13 @@ export class NotificationService {
     const notificationReference = this.generateNotificationReference(
       notificationData.user,
     );
+
     await this.emailService.sendEmailConfirmationSuccessNotification(
+      notificationData,
+      notificationReference,
+    );
+
+    await this.appService.sendEmailConfirmationRequestNotification(
       notificationData,
       notificationReference,
     );

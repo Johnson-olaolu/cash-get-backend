@@ -61,6 +61,7 @@ export class EmailService {
     });
     return response;
   }
+
   async sendEmailConfirmationRequestNotification(
     data: INotificationData<IEmailConfirmationRequest>,
     ref: string,
@@ -124,6 +125,7 @@ export class EmailService {
     );
     // return response;
   }
+
   async sendChangePasswordConfirmationEmail(
     data: INotificationData<IPasswordChangeRequest>,
     ref: string,

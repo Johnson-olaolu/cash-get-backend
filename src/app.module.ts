@@ -9,6 +9,10 @@ import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './utils/env.validate';
 import { DatabaseModule } from './database/database.module';
 import { SeedService } from './seed/seed.service';
+import { WalletModule } from './wallet/wallet.module';
+import { ServicesModule } from './services/services.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -20,7 +24,13 @@ import { SeedService } from './seed/seed.service';
       isGlobal: true,
       validate: validateEnv,
     }),
+    CacheModule.register({
+      isGlobal: true,
+    }),
     DatabaseModule,
+    WalletModule,
+    ServicesModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeedService],

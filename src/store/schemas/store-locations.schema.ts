@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/user/schemas/user.schema';
 
 @Schema({
   timestamps: true,
 })
-export class StoreLocations {
+export class StoreLocation {
   @Prop({
     required: true,
   })
@@ -30,5 +30,5 @@ export class StoreLocations {
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }])
   admins: User[];
 }
-
-export const StoreSchema = SchemaFactory.createForClass(StoreLocations);
+export type StoreLocationDocument = HydratedDocument<StoreLocation>;
+export const StoreLocationSchema = SchemaFactory.createForClass(StoreLocation);

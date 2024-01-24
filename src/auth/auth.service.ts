@@ -50,8 +50,6 @@ export class AuthService {
     return agent;
   }
 
-  registerBRM() {}
-
   async registerStore(registerShopDto: RegisterStoreDto) {
     const registrationToken = await this.validateRegistrationToken(
       registerShopDto.registrationToken,

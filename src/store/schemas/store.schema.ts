@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/user/schemas/user.schema';
-import { StoreLocations } from './store-locations.schema';
+import { StoreLocationDocument } from './store-locations.schema';
 import { StoreTypeEnum } from 'src/utils/constants';
 
 @Schema({
@@ -38,7 +38,7 @@ export class Store {
   admins: User[];
 
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'StoreLocations' }])
-  locations: StoreLocations[];
+  locations: StoreLocationDocument[];
 }
-
+export type StoreDocument = HydratedDocument<Store>;
 export const StoreSchema = SchemaFactory.createForClass(Store);
