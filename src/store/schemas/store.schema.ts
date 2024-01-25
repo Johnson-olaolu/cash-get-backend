@@ -16,7 +16,17 @@ export class Store {
   @Prop({
     required: true,
   })
+  logo: string;
+
+  @Prop({
+    required: true,
+  })
   email: string;
+
+  @Prop({
+    required: true,
+  })
+  phoneNo: string;
 
   @Prop()
   briefInfo: string;

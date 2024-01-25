@@ -62,6 +62,27 @@ export class EmailService {
     return response;
   }
 
+  async sendStoreCreatedSuccessfullyNotification(
+    data: INotificationData<IEmailConfirmationRequest>,
+    ref: string,
+  ) {
+    const response = await this.sendMail({
+      recipientMail: data.user.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: data.subject,
+      body: `
+       ${data.store.name} has been  created successfully
+      `,
+      title: 'Welcome To The Idea Bank',
+      name: data.name,
+      extraInfo: data.extraInfo,
+    });
+    this.emailLogger.log(
+      `ref:${ref} store created email sent to ${response.accepted}`,
+    );
+    // return response;
+  }
+
   async sendEmailConfirmationRequestNotification(
     data: INotificationData<IEmailConfirmationRequest>,
     ref: string,
@@ -84,6 +105,7 @@ export class EmailService {
     );
     // return response;
   }
+
   async sendEmailConfirmationSuccessNotification(
     data: INotificationData<null>,
     ref: string,

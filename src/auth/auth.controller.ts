@@ -1,13 +1,18 @@
 import {
   Body,
   Controller,
+  FileTypeValidator,
   Get,
   HttpCode,
+  ParseFilePipe,
   Post,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { Express } from 'express';
 import { AuthService } from './auth.service';
 import { UserDocument } from 'src/user/schemas/user.schema';
 import { LocalAuthGuard } from './guards/loginGuard.guard';
@@ -15,9 +20,10 @@ import { GenerateRegistrationTokenDto } from './dto/generate-registration-token.
 import { AuthGuard } from '@nestjs/passport';
 import RoleGuard from './guards/roleGuards.guard';
 import { UserRolesEnum } from 'src/utils/constants';
-import { RegisterAgentDto } from './dto/register.dto';
+import { RegisterAgentDto, RegisterStoreDto } from './dto/register.dto';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -59,11 +65,51 @@ export class AuthController {
   }
 
   @Post('register/agent')
-  async registerAgent(@Body() registerAgentDto: RegisterAgentDto) {
-    const data = await this.authService.registerAgent(registerAgentDto);
+  @UseInterceptors(FileInterceptor('profilePicture'))
+  async registerAgent(
+    @Body() registerAgentDto: RegisterAgentDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          // new MaxFileSizeValidator({ maxSize: 1000 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    profilePicture: Express.Multer.File,
+  ) {
+    const data = await this.authService.registerAgent({
+      ...registerAgentDto,
+      profilePicture,
+    });
     return {
       success: true,
       message: 'Agent registered please confirm your email',
+      data: data,
+    };
+  }
+
+  @Post('register/store')
+  @UseInterceptors(FileInterceptor('logo'))
+  async registerStore(
+    @Body() registerStoreDto: RegisterStoreDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          // new MaxFileSizeValidator({ maxSize: 1000 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    logo: Express.Multer.File,
+  ) {
+    const data = await this.authService.registerStore({
+      ...registerStoreDto,
+      logo: logo,
+    });
+    return {
+      success: true,
+      message: 'Store registered please confirm your email',
       data: data,
     };
   }

@@ -26,6 +26,19 @@ export class NotificationService {
     return notificationReference.toUpperCase();
   }
 
+  async sendStoreCreatedSuccessfullyNotification(
+    notificationData: INotificationData<null>,
+  ) {
+    const notificationReference = this.generateNotificationReference(
+      notificationData.user,
+    );
+
+    await this.emailService.sendStoreCreatedSuccessfullyNotification(
+      notificationData,
+      notificationReference,
+    );
+  }
+
   async sendEmailConfirmationRequestNotification(
     notificationData: INotificationData<IEmailConfirmationRequest>,
   ) {

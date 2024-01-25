@@ -54,7 +54,7 @@ export enum WalletTransactionActionEnum {
 
 export enum CloudinaryFoldersEnum {
   STORE_PROFILE = 'store-profile',
-  AGENT_PROFILE = 'agent-profile',
+  USER_PROFILE = 'user-profile',
 }
 
 export enum TransactionActionEnum {

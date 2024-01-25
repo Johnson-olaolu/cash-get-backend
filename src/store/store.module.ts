@@ -8,6 +8,7 @@ import {
   StoreLocation,
   StoreLocationSchema,
 } from './schemas/store-locations.schema';
+import { WalletModule } from 'src/wallet/wallet.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import {
       { name: StoreLocation.name, schema: StoreLocationSchema },
     ]),
     UserModule,
+    WalletModule,
   ],
   controllers: [StoreController],
   providers: [StoreService],

@@ -34,6 +34,9 @@ export class User {
   })
   userName?: string;
 
+  @Prop()
+  profileImage?: string;
+
   @Prop({
     required: true,
     unique: true,

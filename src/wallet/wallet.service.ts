@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'src/user/schemas/user.schema';
 import { Wallet } from './schemas/wallet.schema';
 import { Model } from 'mongoose';
 import { WalletTransaction } from './schemas/walletTransaction.schema';
@@ -14,6 +13,7 @@ import {
   TransactionStatusEnum,
 } from 'src/utils/constants';
 import { generateReference } from 'src/utils/misc';
+import { StoreDocument } from 'src/store/schemas/store.schema';
 
 @Injectable()
 export class WalletService {
@@ -22,9 +22,9 @@ export class WalletService {
     @InjectModel(WalletTransaction.name)
     private walletTransactionModel: Model<WalletTransaction>,
   ) {}
-  async create(user: User) {
+  async create(store: StoreDocument) {
     const wallet = await this.walletModel.create({
-      user: user,
+      store: store,
     });
     return wallet;
   }

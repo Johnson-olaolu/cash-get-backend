@@ -8,6 +8,9 @@ import {
   Delete,
   UseGuards,
   Req,
+  UploadedFile,
+  ParseFilePipe,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -29,6 +32,27 @@ export class UserController {
   getUser(@Req() req: Request) {
     const user = (req as any).user as UserDocument;
     return this.userService.fetchDetails(user._id as any);
+  }
+
+  @Post('update-profile-picture/:id')
+  async updateProfilePicture(
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          // new MaxFileSizeValidator({ maxSize: 1000 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    profilePicture: Express.Multer.File,
+  ) {
+    const data = await this.userService.updateProfileImage(id, profilePicture);
+    return {
+      success: true,
+      message: 'Profile image updated successfully',
+      data: data,
+    };
   }
 
   @Get()

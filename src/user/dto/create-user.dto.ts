@@ -3,7 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
+  // Matches,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -36,4 +36,7 @@ export class CreateUserDto {
 
   @IsEmail()
   email: string;
+
+  @IsOptional()
+  profilePicture?: Express.Multer.File;
 }

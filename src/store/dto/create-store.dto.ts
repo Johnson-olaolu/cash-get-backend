@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsNotEmptyObject,
   IsObject,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -20,13 +21,17 @@ export class CreateStoreDto {
   @IsEmail()
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  briefInfo: string;
+  @IsOptional()
+  logo?: Express.Multer.File;
 
   @IsString()
   @IsNotEmpty()
-  website: string;
+  briefInfo?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  website?: string;
 
   @IsEnum(StoreTypeEnum)
   type: StoreTypeEnum;

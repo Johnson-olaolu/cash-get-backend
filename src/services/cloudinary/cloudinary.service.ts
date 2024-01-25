@@ -1,11 +1,20 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary } from 'cloudinary';
+import {
+  UploadApiErrorResponse,
+  UploadApiResponse,
+  v2 as cloudinary,
+} from 'cloudinary';
 import { CloudinaryFoldersEnum } from 'src/utils/constants';
+import * as toStream from 'buffer-to-stream';
 
 @Injectable()
 export class CloudinaryService {
-  logger = new Logger(CloudinaryService.name);
+  private logger = new Logger(CloudinaryService.name);
   constructor(private configService: ConfigService) {
     cloudinary.config({
       cloud_name: configService.get('CLOUDINARY_NAME'),
@@ -14,11 +23,27 @@ export class CloudinaryService {
     });
   }
 
-  async upload(file: string, folder: CloudinaryFoldersEnum) {
-    const result = await cloudinary.uploader.upload(file, {
-      folder: `cash-get-${folder}`,
-    });
-    this.logger.log(`Data uploaded successfully`);
-    return result;
+  async upload(file: Express.Multer.File, folder: CloudinaryFoldersEnum) {
+    return new Promise((resolve, reject) => {
+      const upload = cloudinary.uploader.upload_stream(
+        {
+          folder: `cash-get-${folder}`,
+        },
+        (error, response) => {
+          if (error) reject(error);
+          return resolve(response);
+        },
+      );
+      toStream(file.buffer).pipe(upload);
+    })
+      .then((response: UploadApiResponse) => {
+        this.logger.log(
+          `Buffer upload_stream wth promise success - ${response.public_id}`,
+        );
+        return response.url;
+      })
+      .catch((error: UploadApiErrorResponse) => {
+        throw new InternalServerErrorException(error.message);
+      });
   }
 }

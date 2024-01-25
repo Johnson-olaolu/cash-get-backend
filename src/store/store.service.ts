@@ -5,10 +5,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Store } from './schemas/store.schema';
 import { Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
+import { WalletService } from 'src/wallet/wallet.service';
 
 @Injectable()
 export class StoreService {
   constructor(
+    private walletService: WalletService,
     @InjectModel(Store.name) private storeModel: Model<Store>,
     private userService: UserService,
   ) {}
@@ -20,6 +22,8 @@ export class StoreService {
       ...createStoreDto,
       coordinator,
     });
+    await this.walletService.create(store);
+    // send store created notification
     return store;
   }
 
@@ -27,7 +31,7 @@ export class StoreService {
     return `This action returns all store`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} store`;
   }
 

@@ -1,3 +1,4 @@
+import { StoreDocument } from 'src/store/schemas/store.schema';
 import { UserDocument } from 'src/user/schemas/user.schema';
 
 export interface INotification<T> {
@@ -7,6 +8,7 @@ export interface INotification<T> {
 
 export interface INotificationData<T> {
   user?: UserDocument;
+  store?: StoreDocument;
   subject?: string;
   name?: string;
   title: string;

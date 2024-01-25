@@ -10,13 +10,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserRolesEnum, superAdminDetails } from 'src/utils/constants';
+import {
+  CloudinaryFoldersEnum,
+  UserRolesEnum,
+  superAdminDetails,
+} from 'src/utils/constants';
 import { NotificationService } from 'src/notification/notification.service';
 import * as otpGenerator from 'otp-generator';
 import * as moment from 'moment-timezone';
 import { ConfigService } from '@nestjs/config';
 import { encryptData } from '../utils/encryption';
 import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
+import { CloudinaryService } from 'src/services/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UserService {
@@ -25,13 +30,27 @@ export class UserService {
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly configService: ConfigService,
     private notificationService: NotificationService,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async createAgent(createUserDto: CreateUserDto) {
-    const newUser = new this.userModel({
-      ...createUserDto,
-      role: UserRolesEnum.AGENT,
-    });
+    let newUser: UserDocument;
+    if (createUserDto.profilePicture) {
+      const imageUrl = await this.cloudinaryService.upload(
+        createUserDto.profilePicture,
+        CloudinaryFoldersEnum.USER_PROFILE,
+      );
+      newUser = new this.userModel({
+        ...createUserDto,
+        role: UserRolesEnum.AGENT,
+        profileImage: imageUrl,
+      });
+    } else {
+      newUser = new this.userModel({
+        ...createUserDto,
+        role: UserRolesEnum.AGENT,
+      });
+    }
     const emailSentUser = await this.generateConfirmEmailToken(newUser);
     return emailSentUser;
   }
@@ -57,6 +76,17 @@ export class UserService {
       });
       this.logger.log(`superAdmin seeded ${superAdmin._id}`);
     }
+  }
+
+  async updateProfileImage(id: string, profileImage: Express.Multer.File) {
+    const user = await this.userModel.findById(id);
+    const imageUrl = await this.cloudinaryService.upload(
+      profileImage,
+      CloudinaryFoldersEnum.USER_PROFILE,
+    );
+    user.profileImage = imageUrl;
+    await user.save();
+    return user;
   }
 
   async findAll() {
