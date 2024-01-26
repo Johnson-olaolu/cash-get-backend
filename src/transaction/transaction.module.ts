@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
 import { TransactionGateway } from './transaction.gateway';
@@ -8,12 +8,13 @@ import { Transaction, TransactionSchema } from './schemas/transaction.schema';
 
 @Module({
   imports: [
-    WalletModule,
     MongooseModule.forFeature([
       { name: Transaction.name, schema: TransactionSchema },
     ]),
+    forwardRef(() => WalletModule),
   ],
   controllers: [TransactionController],
   providers: [TransactionService, TransactionGateway],
+  exports: [TransactionService],
 })
 export class TransactionModule {}

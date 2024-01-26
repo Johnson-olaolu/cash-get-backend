@@ -15,7 +15,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { RegisterAgentDto, RegisterStoreDto } from './dto/register.dto';
 import { StoreService } from 'src/store/store.service';
-import { TokenStatusEnum, UserRolesEnum } from 'src/utils/constants';
+import {
+  StoreTypeEnum,
+  TokenStatusEnum,
+  UserRolesEnum,
+} from 'src/utils/constants';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
@@ -50,12 +54,15 @@ export class AuthService {
     return agent;
   }
 
-  async registerStore(registerShopDto: RegisterStoreDto) {
+  async registerStore(registerShopDto: Omit<RegisterStoreDto, 'type'>) {
     const registrationToken = await this.validateRegistrationToken(
       registerShopDto.registrationToken,
       UserRolesEnum.STORE_MANAGER,
     );
-    const store = await this.storeService.createStore(registerShopDto);
+    const store = await this.storeService.createStore({
+      ...registerShopDto,
+      type: StoreTypeEnum.STORE,
+    });
     registrationToken.registered = store._id as any;
     await registrationToken.save();
     return store;

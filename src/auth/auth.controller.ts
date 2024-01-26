@@ -92,7 +92,7 @@ export class AuthController {
   @Post('register/store')
   @UseInterceptors(FileInterceptor('logo'))
   async registerStore(
-    @Body() registerStoreDto: RegisterStoreDto,
+    @Body() registerStoreDto: Omit<RegisterStoreDto, 'type'>,
     @UploadedFile(
       new ParseFilePipe({
         validators: [

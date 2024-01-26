@@ -7,16 +7,17 @@ import {
   WalletTransactionActionEnum,
 } from 'src/utils/constants';
 import { WalletDocument } from './wallet.schema';
+import { TransactionDocument } from 'src/transaction/schemas/transaction.schema';
 
 @Schema({
   timestamps: true,
 })
 export class WalletTransaction {
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'Wallet' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' })
   wallet: WalletDocument;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'Wallet' })
-  transaction: WalletDocument;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' })
+  transaction: TransactionDocument;
 
   @Prop({ required: true })
   amount: number;
@@ -29,6 +30,12 @@ export class WalletTransaction {
 
   @Prop()
   transactionReference: string;
+
+  @Prop()
+  description: string;
+
+  @Prop({ default: 'NGN' })
+  currency: string;
 
   @Prop({ required: true, type: String, enum: TransactionTypeEnum })
   type: TransactionTypeEnum;

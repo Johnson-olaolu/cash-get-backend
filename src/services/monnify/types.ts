@@ -19,7 +19,7 @@ export interface IInitiateCreditResponse {
   checkoutUrl: string;
 }
 
-export interface IConfirmPaymentResponse {
+export interface IConfirmCreditResponse {
   transactionReference: string;
   paymentReference: string;
   amountPaid: string;

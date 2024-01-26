@@ -1,10 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Cache } from 'cache-manager';
 import {
+  IConfirmCreditResponse,
   IConfirmDisbursementResponse,
-  IConfirmPaymentResponse,
   IInitiateCreditResponse,
 } from './types';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -12,7 +16,9 @@ import { TransactionActionEnum } from 'src/utils/constants';
 
 @Injectable()
 export class MonnifyService {
-  private redirectUrl = '';
+  private redirectUrl = `${this.configService.get(
+    'BASE_URL',
+  )}/transaction/confirm-credit`;
   constructor(
     private configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -21,7 +27,7 @@ export class MonnifyService {
   private async generateMonnifyToken(): Promise<string> {
     const clientIDSecretInBase64 = Buffer.from(
       `${this.configService.get('MONNIFY_API_KEY')}:${this.configService.get(
-        'MONNIFY_SECRET_KEY',
+        'MONNIFY_API_SECRET',
       )}`,
       'utf8',
     ).toString('base64');
@@ -33,6 +39,7 @@ export class MonnifyService {
     const cachedAccessToken = await this.cacheManager.get(
       'MONNIFY_ACCESS_TOKEN',
     );
+
     if (cachedAccessToken) {
       return cachedAccessToken as any;
     }
@@ -45,21 +52,23 @@ export class MonnifyService {
       },
     );
     const { responseBody } = response.data;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { accessToken, expiresIn } = responseBody;
-
-    await this.cacheManager.set('MONNIFY_ACCESS_TOKEN', accessToken, expiresIn);
+    await this.cacheManager.set(
+      'MONNIFY_ACCESS_TOKEN',
+      accessToken,
+      expiresIn * 10,
+    );
 
     return accessToken;
   }
 
-  async initiateDebitTransaction(payload: {
+  async initiateCreditTransaction(payload: {
     name: string;
     email: string;
     amount: number;
     paymentReference: string;
     paymentDescription: string;
-    currency: string;
+    currency?: string;
   }): Promise<IInitiateCreditResponse> {
     try {
       const transactionPayload = {
@@ -67,8 +76,8 @@ export class MonnifyService {
         customerName: payload.name,
         customerEmail: payload.email,
         paymentReference: payload.paymentReference,
-        paymentDescription: 'Trial transaction',
-        currencyCode: payload.currency,
+        paymentDescription: payload.paymentDescription,
+        currencyCode: payload.currency || 'NGN',
         contractCode: this.configService.get('MONNIFY_CONTRACT_CODE'),
         redirectUrl: this.redirectUrl,
         paymentMethods: ['CARD', 'ACCOUNT_TRANSFER'],
@@ -89,14 +98,15 @@ export class MonnifyService {
       );
       const { responseBody } = response.data;
       return responseBody;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // console.log(error);
+      throw new InternalServerErrorException('Encountered an error');
     }
   }
 
-  async confirmDebitTransaction(
+  async confirmCreditTransaction(
     transactionReference: string,
-  ): Promise<IConfirmPaymentResponse> {
+  ): Promise<IConfirmCreditResponse> {
     try {
       const token = await this.generateMonnifyToken();
 

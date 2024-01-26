@@ -28,9 +28,10 @@ import { TransactionModule } from './transaction/transaction.module';
       isGlobal: true,
     }),
     DatabaseModule,
+    TransactionModule,
+
     WalletModule,
     ServicesModule,
-    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeedService],

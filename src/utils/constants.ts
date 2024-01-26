@@ -75,3 +75,9 @@ export enum OrderStatusesEnum {
   CANCELLED = 'CANCELED',
   FAILED = 'FAILED',
 }
+
+export enum TransactionProgressEnum {
+  STARTED = 'STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}

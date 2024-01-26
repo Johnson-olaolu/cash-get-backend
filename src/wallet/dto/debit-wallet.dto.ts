@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
-
 export class DebitWalletDto {
   @IsNumber()
   @Min(100)
@@ -8,4 +7,16 @@ export class DebitWalletDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  accountNo: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bankCode: string;
+
+  @IsString()
+  @IsNotEmpty()
+  accountName: string;
 }

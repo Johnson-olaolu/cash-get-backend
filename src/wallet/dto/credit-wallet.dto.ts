@@ -8,16 +8,4 @@ export class CreditWalletDto {
   @IsString()
   @IsNotEmpty()
   description: string;
-
-  @IsString()
-  @IsNotEmpty()
-  accountNo: string;
-
-  @IsString()
-  @IsNotEmpty()
-  bankCode: string;
-
-  @IsString()
-  @IsNotEmpty()
-  accountName: string;
 }

@@ -8,7 +8,7 @@ import { WalletTransaction } from './walletTransaction.schema';
   timestamps: true,
 })
 export class Wallet {
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'Store' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Store' })
   store: Store;
 
   @Prop({ default: 0 })
@@ -17,7 +17,7 @@ export class Wallet {
   @Prop({ default: 0 })
   public ledgerBalance: number;
 
-  @Prop([{ type: mongoose.Types.ObjectId, ref: 'WalletTransactions' }])
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'WalletTransactions' }])
   transactions: WalletTransaction[];
 }
 export type WalletDocument = HydratedDocument<Wallet>;

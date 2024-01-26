@@ -8,6 +8,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -21,6 +22,9 @@ export class CreateStoreDto {
   @IsEmail()
   email: string;
 
+  @IsString()
+  phoneNo: string;
+
   @IsOptional()
   logo?: Express.Multer.File;
 
@@ -31,6 +35,7 @@ export class CreateStoreDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
+  @IsUrl()
   website?: string;
 
   @IsEnum(StoreTypeEnum)
