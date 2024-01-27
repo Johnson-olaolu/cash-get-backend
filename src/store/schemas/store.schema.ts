@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
+import { UserDocument } from 'src/user/schemas/user.schema';
 import { StoreLocationDocument } from './store-locations.schema';
 import { StoreTypeEnum } from 'src/utils/constants';
 import { WalletDocument } from 'src/wallet/schemas/wallet.schema';
@@ -43,13 +43,13 @@ export class Store {
   type: StoreTypeEnum;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  coordinator: User;
+  coordinator: UserDocument;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' })
   wallet: WalletDocument;
 
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }])
-  admins: User[];
+  admins: UserDocument[];
 
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'StoreLocations' }])
   locations: StoreLocationDocument[];

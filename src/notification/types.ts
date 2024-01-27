@@ -20,6 +20,7 @@ export type notificationMedium = 'email' | 'push' | 'app';
 export type notificationType =
   | 'EmailConfirmationRequest'
   | 'EmailConfirmed'
+  | 'CreditWallet'
   | '';
 
 export interface IEmailConfirmationRequest {

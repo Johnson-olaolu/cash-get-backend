@@ -5,10 +5,10 @@ import {
   INotificationData,
   IPasswordChangeRequest,
 } from './types';
-import { UserDocument } from 'src/user/schemas/user.schema';
 import * as moment from 'moment';
 import * as uniqid from 'uniqid';
 import { AppService } from './app/app.service';
+import { WalletTransactionDocument } from 'src/wallet/schemas/walletTransaction.schema';
 
 @Injectable()
 export class NotificationService {
@@ -17,10 +17,10 @@ export class NotificationService {
     private appService: AppService,
   ) {}
 
-  private generateNotificationReference(user: UserDocument) {
+  private generateNotificationReference(id: string) {
     const presentDate = moment().format('YYYYMMDD');
     const notificationReference = uniqid(
-      `CG_${user._id}-`,
+      `CG_${id}-`,
       `-${presentDate}`,
     ) as string;
     return notificationReference.toUpperCase();
@@ -30,7 +30,7 @@ export class NotificationService {
     notificationData: INotificationData<null>,
   ) {
     const notificationReference = this.generateNotificationReference(
-      notificationData.user,
+      notificationData.user.id,
     );
 
     await this.emailService.sendStoreCreatedSuccessfullyNotification(
@@ -43,7 +43,7 @@ export class NotificationService {
     notificationData: INotificationData<IEmailConfirmationRequest>,
   ) {
     const notificationReference = this.generateNotificationReference(
-      notificationData.user,
+      notificationData.user.id,
     );
 
     await this.emailService.sendEmailConfirmationRequestNotification(
@@ -56,7 +56,7 @@ export class NotificationService {
     notificationData: INotificationData<null>,
   ) {
     const notificationReference = this.generateNotificationReference(
-      notificationData.user,
+      notificationData.user.id,
     );
 
     await this.emailService.sendEmailConfirmationSuccessNotification(
@@ -74,9 +74,26 @@ export class NotificationService {
     notificationData: INotificationData<IPasswordChangeRequest>,
   ) {
     const notificationReference = this.generateNotificationReference(
-      notificationData.user,
+      notificationData.user.id,
     );
     await this.emailService.sendChangePasswordUrlNotification(
+      notificationData,
+      notificationReference,
+    );
+  }
+
+  async sendCreditAccountNotification(
+    notificationData: INotificationData<WalletTransactionDocument>,
+  ) {
+    const notificationReference = this.generateNotificationReference(
+      notificationData.store.id,
+    );
+
+    await this.emailService.sendCreditAccountEmail(
+      notificationData,
+      notificationReference,
+    );
+    await this.appService.sendCreditWalletNotification(
       notificationData,
       notificationReference,
     );

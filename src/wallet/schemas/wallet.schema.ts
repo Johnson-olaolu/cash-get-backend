@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Store } from 'src/store/schemas/store.schema';
+import { StoreDocument } from 'src/store/schemas/store.schema';
 import { WalletTransaction } from './walletTransaction.schema';
 
 @Schema({
@@ -9,7 +9,7 @@ import { WalletTransaction } from './walletTransaction.schema';
 })
 export class Wallet {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Store' })
-  store: Store;
+  store: StoreDocument;
 
   @Prop({ default: 0 })
   balance: number;

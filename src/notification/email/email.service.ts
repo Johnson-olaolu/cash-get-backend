@@ -6,6 +6,7 @@ import {
 } from '../types';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { WalletTransactionDocument } from 'src/wallet/schemas/walletTransaction.schema';
 
 @Injectable()
 export class EmailService {
@@ -30,7 +31,7 @@ export class EmailService {
     body,
     extraInfo,
   }: {
-    recipientMail: string;
+    recipientMail: string | string[];
     subject: string;
     name: string;
     title: string;
@@ -157,6 +158,26 @@ export class EmailService {
       subject: data.subject,
       body: `
         Password change successfull
+      `,
+      title: data.title,
+      name: data.name,
+      extraInfo: data.extraInfo,
+    });
+    this.emailLogger.log(
+      `ref:${ref} password reset confirmation email sent to ${response.accepted}`,
+    );
+    return response;
+  }
+
+  async sendCreditAccountEmail(
+    data: INotificationData<WalletTransactionDocument>,
+    ref: string,
+  ) {
+    const response = await this.sendMail({
+      recipientMail: data.user.email,
+      subject: data.subject,
+      body: `
+       wallet credited with ${data.data.amount}
       `,
       title: data.title,
       name: data.name,

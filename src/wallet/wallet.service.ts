@@ -21,6 +21,7 @@ import { StoreDocument } from 'src/store/schemas/store.schema';
 import { CreditWalletDto } from './dto/credit-wallet.dto';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { TransactionDocument } from 'src/transaction/schemas/transaction.schema';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class WalletService {
@@ -30,6 +31,7 @@ export class WalletService {
     private walletTransactionModel: Model<WalletTransaction>,
     @Inject(forwardRef(() => TransactionService))
     private transactionService: TransactionService,
+    private notificationService: NotificationService,
   ) {}
   async create(store: StoreDocument) {
     const wallet = await this.walletModel.create({
@@ -47,6 +49,7 @@ export class WalletService {
     if (!wallet) {
       throw new NotFoundException('No Wallet found for this id');
     }
+    await wallet.store.populate('coordinator');
     return wallet;
   }
 
@@ -57,6 +60,7 @@ export class WalletService {
     if (!wallet) {
       throw new NotFoundException('No Wallet found for this id');
     }
+    await wallet.store.populate('coordinator');
     return wallet;
   }
 
@@ -104,7 +108,7 @@ export class WalletService {
 
   async creditWallet(walletId: string, transaction: TransactionDocument) {
     const wallet = await this.findOne(walletId);
-    await this.walletTransactionModel.create({
+    const walletTransaction = await this.walletTransactionModel.create({
       wallet: wallet,
       currBalance: wallet.balance - transaction.amount,
       prevBalance: wallet.balance,
@@ -117,15 +121,18 @@ export class WalletService {
       transactionStatus: TransactionStatusEnum.CONFIRMED,
     });
 
-    wallet.balance = wallet.balance - transaction.amount;
-    wallet.ledgerBalance = wallet.ledgerBalance - transaction.amount;
+    wallet.balance = wallet.balance + transaction.amount;
+    wallet.ledgerBalance = wallet.ledgerBalance + transaction.amount;
     wallet.save();
-
-    // Debit wallet notification
-    // await this.mailService.sendDebitConfirmedMail(wallet.user, {
-    //   currency: payload.currency,
-    //   amount: payload.amount,
-    // });
+    await this.notificationService.sendCreditAccountNotification({
+      title: 'Credit Wallet',
+      data: walletTransaction,
+      extraInfo: '',
+      name: wallet.store.name,
+      store: wallet.store,
+      subject: 'Credit Wallet',
+      user: wallet.store.coordinator,
+    });
     return wallet;
   }
 
