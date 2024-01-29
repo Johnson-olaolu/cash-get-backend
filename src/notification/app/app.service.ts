@@ -35,7 +35,7 @@ export class AppService {
     ref: string,
   ) {
     await this.appNotificationModel.create({
-      data: data,
+      data: data.data,
       notificationRef: ref,
       summary: `Walet credited with ${data.data.amount}`,
       notificationType: 'CreditWallet',

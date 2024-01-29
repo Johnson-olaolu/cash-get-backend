@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { UserDocument } from 'src/user/schemas/user.schema';
-import { StoreLocationDocument } from './store-locations.schema';
+import { StoreLocationDocument } from './store-location.schema';
 import { StoreTypeEnum } from 'src/utils/constants';
 import { WalletDocument } from 'src/wallet/schemas/wallet.schema';
 

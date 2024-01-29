@@ -1,11 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { User } from 'src/user/schemas/user.schema';
+import { StoreDocument } from './store.schema';
 
 @Schema({
   timestamps: true,
 })
 export class StoreLocation {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Store' })
+  store: StoreDocument;
+
   @Prop({
     required: true,
   })
@@ -15,6 +19,11 @@ export class StoreLocation {
     required: true,
   })
   email: string;
+
+  @Prop({
+    required: true,
+  })
+  phoneNo: string;
 
   @Prop()
   briefInfo: string;

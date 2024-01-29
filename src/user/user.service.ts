@@ -33,7 +33,7 @@ export class UserService {
     private cloudinaryService: CloudinaryService,
   ) {}
 
-  async createAgent(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto, role: UserRolesEnum) {
     let newUser: UserDocument;
     if (createUserDto.profilePicture) {
       const imageUrl = await this.cloudinaryService.upload(
@@ -42,13 +42,13 @@ export class UserService {
       );
       newUser = new this.userModel({
         ...createUserDto,
-        role: UserRolesEnum.AGENT,
+        role: role,
         profileImage: imageUrl,
       });
     } else {
       newUser = new this.userModel({
         ...createUserDto,
-        role: UserRolesEnum.AGENT,
+        role: role,
       });
     }
     const emailSentUser = await this.generateConfirmEmailToken(newUser);
@@ -59,6 +59,16 @@ export class UserService {
     const newUser = new this.userModel({
       ...createUserDto,
       role: UserRolesEnum.STORE_MANAGER,
+    });
+    const emailSentUser = await this.generateConfirmEmailToken(newUser);
+    await emailSentUser.save();
+    return emailSentUser;
+  }
+
+  async createStoreLocationManager(createUserDto: CreateUserDto) {
+    const newUser = new this.userModel({
+      ...createUserDto,
+      role: UserRolesEnum.STORE_LOCATION_MANAGER,
     });
     const emailSentUser = await this.generateConfirmEmailToken(newUser);
     await emailSentUser.save();

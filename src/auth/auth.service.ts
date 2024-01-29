@@ -13,7 +13,11 @@ import { GenerateRegistrationTokenDto } from './dto/generate-registration-token.
 import { RegistrationToken } from './schemas/RegistrationToken.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { RegisterAgentDto, RegisterStoreDto } from './dto/register.dto';
+import {
+  RegisterAgentDto,
+  RegisterStoreAdminDto,
+  RegisterStoreDto,
+} from './dto/register.dto';
 import { StoreService } from 'src/store/store.service';
 import {
   StoreTypeEnum,
@@ -47,7 +51,10 @@ export class AuthService {
       registerAgentDto.registrationToken,
       UserRolesEnum.AGENT,
     );
-    const agent = await this.userService.createAgent(registerAgentDto);
+    const agent = await this.userService.createUser(
+      registerAgentDto,
+      UserRolesEnum.AGENT,
+    );
     registrationToken.registered = agent._id as any;
     registrationToken.status = TokenStatusEnum.USED;
     await registrationToken.save();
@@ -68,12 +75,35 @@ export class AuthService {
     return store;
   }
 
+  async registerStoreAdmin(
+    storeId: string,
+    registerStoreAdminDto: RegisterStoreAdminDto,
+  ) {
+    const registrationToken = await this.validateRegistrationToken(
+      registerStoreAdminDto.registrationToken,
+      UserRolesEnum.SUPER_ADMIN,
+    );
+
+    const store = await this.storeService.findOne(storeId);
+
+    const storeAdmin = await this.userService.createUser(
+      registerStoreAdminDto,
+      UserRolesEnum.STORE_ADMIN,
+    );
+    store.admins = [...(store.admins || []), storeAdmin];
+    registrationToken.registered = storeAdmin.id;
+    await registrationToken.save();
+    await store.save();
+    return storeAdmin;
+  }
+
   async generateRegistrationToken(
     generateRegistrationTokenDto: GenerateRegistrationTokenDto,
   ) {
     const user = await this.userService.findOne(
       generateRegistrationTokenDto.userId,
     );
+
     const token = otpGenerator.generate(12, {
       digits: true,
       lowerCaseAlphabets: false,

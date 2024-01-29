@@ -1,9 +1,11 @@
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 export const BCRYPT_HASH_ROUND = 5;
+
 export enum UserRolesEnum {
   SUPER_ADMIN = 'SUPER_ADMIN',
   AGENT = 'AGENT',
   STORE_MANAGER = 'STORE_MANAGER',
+  STORE_ADMIN = 'STORE_ADMIN',
   BRM_MANAGER = 'BRM_MANAGER',
   STORE_LOCATION_MANAGER = 'STORE_LOCATION_MANAGER',
 }

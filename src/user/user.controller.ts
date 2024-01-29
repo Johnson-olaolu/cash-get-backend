@@ -13,7 +13,6 @@ import {
   FileTypeValidator,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserDocument } from './schemas/user.schema';
@@ -23,10 +22,10 @@ import { UserDocument } from './schemas/user.schema';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  createAgent(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createAgent(createUserDto);
-  }
+  // @Post()
+  // createAgent(@Body() createUserDto: CreateUserDto) {
+  //   return this.userService.createAgent(createUserDto);
+  // }
 
   @Get('me')
   getUser(@Req() req: Request) {

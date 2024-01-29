@@ -15,3 +15,10 @@ export class RegisterAgentDto extends CreateUserDto {
   @Length(12, 12)
   registrationToken: string;
 }
+
+export class RegisterStoreAdminDto extends CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  @Length(12, 12)
+  registrationToken: string;
+}

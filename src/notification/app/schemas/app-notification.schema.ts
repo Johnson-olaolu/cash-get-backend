@@ -30,8 +30,8 @@ export class AppNotification {
   })
   status: AppNotificationEnum;
 
-  @Prop()
-  data: string;
+  @Prop({ type: Object })
+  data: any;
 }
 
 export const AppNotificationSchema =

@@ -42,13 +42,7 @@ export class AuthController {
     };
   }
 
-  @UseGuards(
-    RoleGuard([
-      UserRolesEnum.SUPER_ADMIN,
-      UserRolesEnum.STORE_MANAGER,
-      UserRolesEnum.BRM_MANAGER,
-    ]),
-  )
+  @UseGuards(RoleGuard([UserRolesEnum.SUPER_ADMIN]))
   @UseGuards(AuthGuard('jwt'))
   @Post('generate-registration-token')
   async generateRegistrationToken(

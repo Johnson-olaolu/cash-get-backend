@@ -29,7 +29,6 @@ import { TransactionModule } from './transaction/transaction.module';
     }),
     DatabaseModule,
     TransactionModule,
-
     WalletModule,
     ServicesModule,
   ],
